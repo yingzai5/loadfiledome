@@ -20,7 +20,7 @@ int main(int argc, char *argv[])
     engine.load(url);
 
     TfileThread* m_dsad = new TfileThread(nullptr);
-    QString path = "D:\\Code\\qmlControlLib\\";
+    QString path = "c:\\";
     m_dsad->startload(path);
     return app.exec();
 }

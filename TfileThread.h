@@ -10,6 +10,7 @@ public:
     ~TfileThread() override;
     Q_INVOKABLE void startload(QString& path);
     Q_INVOKABLE QList<QString> Getfilelist();
+    void getFiles(const QString& path);
 
 protected:
     void run() override;
