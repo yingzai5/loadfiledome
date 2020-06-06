@@ -20,7 +20,7 @@ int main(int argc, char *argv[])
     engine.load(url);
 
     TfileThread* m_dsad = new TfileThread(nullptr);
-    QString path = "c:\\";
+    QString path = "D:\\";
     m_dsad->startload(path);
     return app.exec();
 }

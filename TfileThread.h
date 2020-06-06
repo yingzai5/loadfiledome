@@ -11,6 +11,8 @@ public:
     Q_INVOKABLE void startload(QString& path);
     Q_INVOKABLE QList<QString> Getfilelist();
     void getFiles(const QString& path);
+    void queuegetFiles(const QString& path);
+    void iteratorgetFile(const QString& path);
 
 protected:
     void run() override;

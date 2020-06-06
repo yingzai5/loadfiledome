@@ -2,6 +2,7 @@
 #include <QDir>
 #include <QtDebug>
 #include <QDateTime>
+#include <qdiriterator.h>
 
 TfileThread::TfileThread(QObject* parent) : QThread(parent)
 {
@@ -16,14 +17,44 @@ TfileThread::~TfileThread()
 void TfileThread::run()
 {
     m_filelist.clear();
-    QDir dir;
-    dir.setPath(m_path);
+    qDebug()<<"队列start ::"<< QDateTime::currentDateTime();
+    queuegetFiles(m_path);
+    qDebug()<<"队列end ::"<< QDateTime::currentDateTime();
+    qDebug()<<"m_filelist.count::"<<m_filelist.count();
+    m_filelist.clear();
+    qDebug()<<"递归start ::"<< QDateTime::currentDateTime();
+    getFiles(m_path);
+    qDebug()<<"递归end ::"<< QDateTime::currentDateTime();
+    qDebug()<<"m_filelist.count::"<<m_filelist.count();
+
+    m_filelist.clear();
+    qDebug()<<"迭代器start ::"<< QDateTime::currentDateTime();
+    iteratorgetFile(m_path);
+    qDebug()<<"迭代器end ::"<< QDateTime::currentDateTime();
+    qDebug()<<"m_filelist.count::"<<m_filelist.count();
+
+    //emit sigloadending(m_filelist.count());
+}
+
+void TfileThread::iteratorgetFile(const QString& path)
+{
+    QDirIterator dir_iterator(path,
+                   QDir::Files | QDir::NoSymLinks,
+                   QDirIterator::Subdirectories);
+    while(dir_iterator.hasNext())
+     {
+        dir_iterator.next();
+        QFileInfo file_info =dir_iterator.fileInfo();
+        //QString absolute_file_path =file_info.absoluteFilePath();
+        m_filelist<<file_info.absoluteFilePath();
+     }
+}
+//队列实现文件的遍历
+void TfileThread::queuegetFiles(const QString& path){
+    QDir dir(m_path);
     QFileInfoList infolist = dir.entryInfoList(QDir::AllDirs | QDir::Files | QDir::NoDotAndDotDot);
     QFileInfoList infolist2;
-     qDebug()<<infolist;
     QFileInfo  info;
-    //foreach(const QFileInfo & info,infolist)
-    qDebug()<<"start ::"<< QDateTime::currentDateTime();
     for(int i=0; i < infolist.count(); i++)
     {
         if (this->isInterruptionRequested())
@@ -36,17 +67,11 @@ void TfileThread::run()
             infolist.append(infolist2);
         } else{
             m_filelist<<info.absoluteFilePath();
-            //qDebug()<<"file:" << info.absoluteFilePath();
         }
     }
-    qDebug()<<"end ::"<< QDateTime::currentDateTime();
-    m_filelist.clear();
-    qDebug()<<"start222 ::"<< QDateTime::currentDateTime();
-    getFiles(m_path);
-    qDebug()<<"end222 ::"<< QDateTime::currentDateTime();
-    //emit sigloadending(m_filelist.count());
 }
 
+//递归实现文件的遍历
 void TfileThread::getFiles(const QString& path)
 {
     if (this->isInterruptionRequested())
@@ -54,6 +79,7 @@ void TfileThread::getFiles(const QString& path)
 
     QDir dir;
     dir.setPath(path);
+
     QFileInfoList infolist = dir.entryInfoList(QDir::AllDirs | QDir::Files | QDir::NoDotAndDotDot);
 
     foreach(const QFileInfo & info, infolist)
